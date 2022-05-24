@@ -2,6 +2,8 @@
 using Amazon.Extensions.CognitoAuthentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.WindowsAPICodePack.Shell;
+using System.Net;
 using WebAdvert.Web.Models.Accounts;
 
 namespace WebAdvert.Web.Controllers
@@ -169,6 +171,19 @@ namespace WebAdvert.Web.Controllers
                 ModelState.AddModelError("LoginError", "Email and password do not match");
             }
             return View(model);
+        }
+
+        public async Task<IActionResult> Download()
+        {
+            //WebClient myWebClient = new WebClient();
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Request");
+            var res = client.GetAsync("https://api.github.com/repos/m-krishnachaitanya/covid-19-api/zipball/master").Result;
+            var reqBytes = await res.Content.ReadAsByteArrayAsync();
+            //myWebClient.Headers.Add("User-Agent", "Request");
+            //var filepath = KnownFolders.Downloads.Path + "/template.zip";
+            //myWebClient.DownloadFileAsync(new Uri("https://api.github.com/repos/m-krishnachaitanya/covid-19-api/zipball/master"), filepath);
+            return File(reqBytes, "application/zip", "template.zip", true);
         }
     }
 }
